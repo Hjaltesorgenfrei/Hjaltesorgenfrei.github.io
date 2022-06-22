@@ -1,7 +1,13 @@
+.cards {
+    display: flex;
+}
+
 /* https://codepen.io/jefflombard/pen/GqBzxe */
 .card-container {
     display: flex;
-    flex-wrap: wrap;
+    -webkit-flex-direction: column; 
+    flex-direction: column; 
+    margin-top: 2em;
 }
 
 /* https://codepen.io/jefflombard/pen/GqBzxe */
@@ -10,21 +16,31 @@
     font-family: Helvetica, sans-serif;
     font-weight: bolder;
     font-size: 22px;
-    flex: 1;
     width: 8em;
+    flex: 1;
     height: 10em;
     border-radius: .25in;
     transition: 0.5s;
     filter: drop-shadow(0 0 0px black);
     /* Display Properties */
-    margin: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
     user-select: none;
 }
 
-.card:hover {
+play-card:not(:first-child) {
+    margin-top: -8em;
+}
+
+.card:hover,.card.selected  {
     filter: drop-shadow(0 0 3px black);
-    margin-top: -0.3em;
     cursor: pointer;
+    margin-top: -1.5em;
+    margin-bottom: 1.5em;
+}
+
+.card.selected {
+    border-color: greenyellow;
 }
 
 .dark {

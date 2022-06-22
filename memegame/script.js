@@ -114,12 +114,24 @@ function setCurrentHost(hostname) {
     current_host.innerText = hostname;
 }
 
+function click_card(card_element) {
+    if (card_element.classList.contains('selected')) {
+        return;
+    }
+    let elements = document.getElementsByClassName(card_element.classList);
+    for (let element of elements) {
+        element.classList.remove('selected');
+    }
+    card_element.classList.add('selected');
+    console.log("Selected");
+}
+
 function createTextCards(top_texts, bottom_texts) {
     if (top_texts) {
         let top_texts_container = document.getElementById('top_texts');
         top_texts_container.innerHTML = "";
         top_texts.forEach(element => {
-            let card = new Card(element);
+            let card = new Card(element, click_card, "top_text");
             top_texts_container.appendChild(card);
         });
     }
@@ -127,7 +139,7 @@ function createTextCards(top_texts, bottom_texts) {
         let bottom_texts_container = document.getElementById('bottom_texts');
         bottom_texts_container.innerHTML = "";
         bottom_texts.forEach(element => {
-            let card = new Card(element);
+            let card = new Card(element, click_card, "bottom_text");
             bottom_texts_container.appendChild(card);
         });
     }
