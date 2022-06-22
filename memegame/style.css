@@ -46,7 +46,7 @@
 }
 
 play-card:not(:first-child) {
-    margin-top: -8em;
+    margin-top: -6em;
 }
 
 .card:hover,.card.selected  {
@@ -56,6 +56,10 @@ play-card:not(:first-child) {
 
 .card.selected {
     border-color: greenyellow;
+}
+
+.card.remove {
+    border-color: red;
 }
 
 .dark {
@@ -77,4 +81,21 @@ play-card:not(:first-child) {
     padding-left: 7%;
     padding-right: 7%;
     word-wrap: break-word;
+}
+
+.longpress {
+    -webkit-animation: 1s longpress;
+            animation: 1s longpress;
+}
+
+@-webkit-keyframes longpress {
+    40% { background: white; }
+    60% { background: yellow; }
+    100% { background: red; }
+}
+
+@keyframes longpress {
+    40% { background: white; }
+    60% { background: yellow; }
+    100% { background: red; }
 }
