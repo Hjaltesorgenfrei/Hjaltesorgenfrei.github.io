@@ -115,6 +115,7 @@ function setCurrentHost(hostname) {
 }
 
 function click_card(card_element) {
+    card_element.classList.remove('remove');
     if (card_element.classList.contains('selected')) {
         return;
     }
