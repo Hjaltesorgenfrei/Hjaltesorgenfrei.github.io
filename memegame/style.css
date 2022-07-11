@@ -90,12 +90,10 @@ play-card:not(:first-child) {
 
 @-webkit-keyframes longpress {
     40% { background: white; }
-    60% { background: yellow; }
     100% { background: red; }
 }
 
 @keyframes longpress {
     40% { background: white; }
-    60% { background: yellow; }
     100% { background: red; }
 }

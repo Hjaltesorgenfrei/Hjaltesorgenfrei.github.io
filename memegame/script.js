@@ -1,19 +1,27 @@
-import {setCookie, getCookie, eraseCookie} from "./cookies.js";
-import {Card} from "./Card.js";
+import { setCookie, getCookie, eraseCookie } from "./cookies.js";
+import { Card } from "./Card.js";
 customElements.define('play-card', Card);
 
-let socket = new WebSocket("wss://mega-meme-game.herokuapp.com/");
-// let socket = new WebSocket("ws://localhost:5678");
+let socketUrl = window.location.hostname.startsWith("localhost")
+    ? "ws://localhost:5678"
+    : "wss://mega-meme-game.herokuapp.com/";
+
+console.log(window.location.hostname)
+
+let socket = new WebSocket(socketUrl);
+var currentVisualUrl = null;
+var currentTopText = null;
+var currentBottomText = null;
 
 function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * 
- charactersLength));
-   }
-   return result;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return result;
 }
 
 function generate_guid() {
@@ -43,6 +51,72 @@ function join_with_username(username) {
     socket.send(JSON.stringify(message));
 }
 
+function getLines(ctx, text, maxWidth) {
+    var words = text.split(" ");
+    var lines = [];
+    var currentLine = words[0];
+
+    for (var i = 1; i < words.length; i++) {
+        var word = words[i];
+        var width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+    return lines;
+}
+
+function redraw() {
+    var canvas = document.getElementById("image_container");
+    var context = canvas.getContext("2d");
+    var imageObj = new Image();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    imageObj.onload = function () {
+        context.drawImage(imageObj, 0, 0, 500, 500);
+        context.font = "bold 30pt Impact";
+        context.textAlign = "center"
+        context.fillStyle = "white";
+        context.strokeStyle = "Black";
+        context.lineWidth = 2;
+        if (currentTopText != null) {
+            let textToDraw = getLines(context, currentTopText, 480);
+            let height = 60;
+            for (let line of textToDraw) {
+                context.fillText(line, 250, height);
+                context.strokeText(line, 250, height);
+                height += 50;
+            }
+        }
+        if (currentBottomText != null) {
+            let textToDraw = getLines(context, currentBottomText, 480);
+            let height = 500 - (textToDraw.length * 50);
+            for (let line of textToDraw) {
+                context.fillText(line, 250, height);
+                context.strokeText(line, 250, height);
+                height += 50;
+            }
+        }
+    };
+    if (currentVisualUrl != null) {
+        imageObj.src = currentVisualUrl;
+    }
+}
+
+function showImage(url) {
+    if (!url.startsWith("http")) {
+        url = "https://media.mads.monster/visual/" + url;
+    }
+    currentVisualUrl = url;
+    currentBottomText = null;
+    currentTopText = null;
+    console.log(`New prompt image: ${url}`);
+    redraw();
+}
+
 // Socket Setup
 
 socket.addEventListener('open', function (event) {
@@ -53,7 +127,7 @@ socket.addEventListener('open', function (event) {
 });
 socket.addEventListener('message', function (event) {
     let data = JSON.parse(event.data);
-    switch(data.type) {
+    switch (data.type) {
         case 'username_change_approve':
             usernameChanged(data.username, data.user_id);
             break;
@@ -72,9 +146,12 @@ socket.addEventListener('message', function (event) {
         case 'current_cards':
             createTextCards(data.top_texts, data.bottom_texts);
             break;
-        default: 
+        case 'visual_prompt':
+            showImage(data.url);
+            break;
+        default:
             console.log("Unhandled data", data);
-    }   
+    }
 });
 
 function saveNameChange() {
@@ -109,6 +186,16 @@ function endGame() {
     }
 }
 
+function drawVisual() {
+    if (socket.readyState == socket.OPEN) {
+        let message = {
+            type: 'draw_visual_prompt',
+            user_id: get_user_id()
+        };
+        socket.send(JSON.stringify(message));
+    }
+}
+
 function setCurrentHost(hostname) {
     let current_host = document.getElementById('current_host');
     current_host.innerText = hostname;
@@ -124,7 +211,14 @@ function click_card(card_element) {
         element.classList.remove('selected');
     }
     card_element.classList.add('selected');
-    console.log("Selected");
+    var text = card_element.innerText;
+    if (card_element.parentElement.parentElement.id.startsWith("top")) {
+        currentTopText = text;
+    }
+    else {
+        currentBottomText = text;
+    }
+    redraw();
 }
 
 function createTextCards(top_texts, bottom_texts) {
@@ -155,6 +249,10 @@ function gameStarted() {
         type: 'ask_for_cards',
         user_id: get_user_id()
     };
+    currentVisualUrl = null;
+    currentBottomText = null;
+    currentTopText = null;
+    redraw();
     socket.send(JSON.stringify(message));
 }
 
@@ -180,6 +278,9 @@ function onStartUp() {
 
     let end_game = document.getElementById('end_game');
     end_game.onclick = endGame;
+
+    let draw_visual = document.getElementById('draw_visual');
+    draw_visual.onclick = drawVisual;
 }
 
 async function getAsByteArray(file) {

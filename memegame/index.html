@@ -7,25 +7,30 @@
     <meta http-equiv="Expires" content="0" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Memegame</title>    
+    <title>Memegame</title>
     <script type="module" src="./script.js"></script>
     <link rel="stylesheet" href="./style.css">
-    <link rel="icon" type="image/ico" href="./favicon.ico"/>
+    <link rel="icon" type="image/ico" href="./favicon.ico" />
 </head>
 
 <body>
     <p>Current Name: <b id="show_username">Not Set</b></p>
     <p>Current Game Host: <b id="current_host">No Game In Progress</b></p>
     <input id="name_field" type="text" placeholder="Please enter your name">
-    <button id="save_name_change">Change Name</button> 
+    <button id="save_name_change">Change Name</button>
     <br>
     <button id="start_game">Start Game</button>
     <button id="end_game">End Game</button>
-    <div class="cards">
-        <card-container class="card-container" id="top_texts">
-        </card-container>
-        <card-container class="card-container" id="bottom_texts">
-        </card-container>
+    <button id="draw_visual">Draw Visual</button>
+    <div style="display: flex;">
+        <div class="cards">
+            <card-container class="card-container" id="top_texts">
+            </card-container>
+            <canvas id="image_container" width="500" height="500" style="padding-top: 2em; height: 500px;">
+            </canvas>
+            <card-container class="card-container" id="bottom_texts">
+            </card-container>
+        </div>
     </div>
 </body>
 
