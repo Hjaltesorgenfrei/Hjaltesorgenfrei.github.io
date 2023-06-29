@@ -1,0 +1,36 @@
+<!DOCTYPE html> <html lang="en"> 
+<head> 
+    <title>Coq Auto Complete</title> 
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/favicon-32x32.png">
+</head>
+<body>
+<h1>Coq Auto Complete</h1>
+As a part of my master thesis together with <a href="https://github.com/jakobis">Jakob</a> and <a href="https://simon-green.dev/">Simon</a> we implemented code completion for Coq in the VSCode extension <a href="https://github.com/coq-community/vscoq">VsCoq</a>.
+
+<h2>Why Coq?</h2>
+Coq is a proof assistant and dependently typed.
+This means that when compared to general programming languages such as C# or Java, Coq has more information available for completion.
+An example of this is that in Coq the type information of a function may include such things a list being sorted and having an odd number of elements.
+This information can be used to provide better completion suggestions by suggesting functions which takes sorted lists or lists with odd number of elements as arguments.
+<br>
+Also it had no code completion at the time of writing, and neither did any other proof assistant <a href="#1">[1]</a>. 
+
+<h2>What?</h2>
+The code completion we implemented is merely for the case of using providing terms to tactics in a proof.
+And the ranking algoritms we created are biased towards the apply tactic. 
+We decided on this limited scope to make it possible to implement, as just this limited scope already present a large challenge.
+<br>
+On top of creating mutiple ranking algoritms we also benchmarked their performance on a set of existing Coq projects.
+This was done to ensure the rankings created were useful in practice.
+
+<h2>How?</h2>
+The implementation is done by integrating directly with Coq's internal parsing and proof system.
+Possible suggestions are extracted by using Coq's existing search 
+
+<a name="1">
+    [1] - Technically Lean had code completion, but it makes no effort to priotize the suggestions.
+</a>
+
+
+</body>
